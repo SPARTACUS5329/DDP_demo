@@ -1,32 +1,34 @@
-import os
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.distributed as dist
-from torch.nn.parallel import DistributedDataParallel as DDP
-from torchvision import datasets, transforms
-from torch.utils.data import DataLoader, DistributedSampler
-import matplotlib.pyplot as plt
 import torch.multiprocessing as mp
 import time
-
-torch.manual_seed(0)
-torch.cuda.manual_seed(0)
-
-# Simple Model
-class Net(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        self.fc = nn.Sequential(
-            nn.Linear(28*28, 128),
-            nn.ReLU(),
-            nn.Linear(128, 10)
-        )
-    def forward(self, x):
-        return self.fc(x)
-
+import sys
 
 def train_worker(rank, world_size, epochs=5):
+    import os
+    import torch
+    import torch.nn as nn
+    import torch.optim as optim
+    import torch.distributed as dist
+    from torch.nn.parallel import DistributedDataParallel as DDP
+    from torchvision import datasets, transforms
+    from torch.utils.data import DataLoader, DistributedSampler
+    import matplotlib.pyplot as plt
+
+    torch.manual_seed(0)
+    torch.cuda.manual_seed(0)
+
+    # Simple Model
+    class Net(nn.Module):
+        def __init__(self):
+            super(Net, self).__init__()
+            self.fc = nn.Sequential(
+                nn.Linear(28*28, 128),
+                nn.ReLU(),
+                nn.Linear(128, 10)
+            )
+        def forward(self, x):
+            return self.fc(x)
+
+
     # init process group
     os.environ["MASTER_ADDR"] = "127.0.0.1"
     os.environ["MASTER_PORT"] = "29500"
@@ -66,20 +68,21 @@ def train_worker(rank, world_size, epochs=5):
         print(f"[GPU {rank}] Epoch {epoch+1}/{epochs}, Loss: {loss.item():.4f}")
 
     # Save curve per worker (only rank 0)
-    if rank == 0:
-        plt.plot(losses)
-        plt.xlabel("Iteration")
-        plt.ylabel("Training Loss")
-        plt.title("MNIST DDP Training Loss Curve")
-        os.makedirs("./img", exist_ok=True)
-        plt.savefig("./img/mnist_loss_curve_ddp_pt.png")
+    # if rank == 0:
+    #     plt.plot(losses)
+    #     plt.xlabel("Iteration")
+    #     plt.ylabel("Training Loss")
+    #     plt.title("MNIST DDP Training Loss Curve")
+    #     os.makedirs("./img", exist_ok=True)
+    #     plt.savefig("./img/mnist_loss_curve_ddp_pt.png")
 
     dist.destroy_process_group()
 
 
 if __name__ == "__main__":
     # n_gpus = torch.cuda.device_count()
-    world_size = 4
+    print('Start MNIST training on multiple GPUs (DDP with PyTorch)...')
+    world_size = int(sys.argv[1])
     start_time = time.time()
     mp.spawn(train_worker, args=(world_size, 5), nprocs=world_size, join=True)
     end_time = time.time()

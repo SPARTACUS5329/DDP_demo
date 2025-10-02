@@ -14,6 +14,7 @@ def run(rank, world_size):
 
 
 def main():
+    mp.set_start_method('fork')
     mp.spawn(run, args=(4,), nprocs=4, join=True)
 
 if __name__ == "__main__":

@@ -91,6 +91,6 @@ def train_worker(rank, world_size, epochs=5):
 
 
 if __name__ == "__main__":
-    n_gpus = torch.cuda.device_count()
-    world_size = min(4, n_gpus)
+    print('Start MNIST training on multiple GPUs (manual DDP + profiling)...')
+    world_size = 4
     mp.spawn(train_worker, args=(world_size, 5), nprocs=world_size, join=True)
