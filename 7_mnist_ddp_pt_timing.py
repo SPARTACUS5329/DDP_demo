@@ -31,7 +31,7 @@ def train_worker(rank, world_size, epochs=5):
 
     # init process group
     os.environ["MASTER_ADDR"] = "127.0.0.1"
-    os.environ["MASTER_PORT"] = "29500"
+    os.environ["MASTER_PORT"] = "29502"
     dist.init_process_group("nccl", rank=rank, world_size=world_size)
 
     # Device
@@ -54,6 +54,8 @@ def train_worker(rank, world_size, epochs=5):
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     losses = []
+    # Timing the training process
+    start_time = time.time()
     for epoch in range(epochs):
         sampler.set_epoch(epoch)  # important for shuffle
         for data, target in train_loader:
@@ -65,7 +67,10 @@ def train_worker(rank, world_size, epochs=5):
             optimizer.step()
             losses.append(loss.item())
 
-        print(f"[GPU {rank}] Epoch {epoch+1}/{epochs}, Loss: {loss.item():.4f}")
+        # print(f"[GPU {rank}] Epoch {epoch+1}/{epochs}, Loss: {loss.item():.4f}")
+    # print training time per worker
+    end_time = time.time()
+    print(f"[GPU {rank}] Training completed in {end_time - start_time:.2f} seconds.")
 
     # Save curve per worker (only rank 0)
     # if rank == 0:
@@ -82,8 +87,9 @@ def train_worker(rank, world_size, epochs=5):
 if __name__ == "__main__":
     # n_gpus = torch.cuda.device_count()
     print('Start MNIST training on multiple GPUs (DDP with PyTorch)...')
-    world_size = int(sys.argv[1])
-    start_time = time.time()
+    world_size = int(sys.argv[1]) # pass number of GPUs as command line argument
+    start_time = time.time() # overall time
+    # mp.set_start_method('fork')
     mp.spawn(train_worker, args=(world_size, 5), nprocs=world_size, join=True)
-    end_time = time.time()
+    end_time = time.time() # overall time
     print(f"World Size: {world_size}. Training completed in {end_time - start_time:.2f} seconds.")

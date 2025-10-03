@@ -7,6 +7,7 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, DistributedSampler
 import matplotlib.pyplot as plt
 import torch.multiprocessing as mp
+# Profiling
 from torch.profiler import profile, record_function, ProfilerActivity
 
 
@@ -47,10 +48,9 @@ def train_worker(rank, world_size, epochs=5):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
+    # Training loop with profiling
     with profile(
         activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
-        # use_cuda=True,
-        # use_kineto=True,
         record_shapes=True,
         profile_memory=True,
         with_stack=True,

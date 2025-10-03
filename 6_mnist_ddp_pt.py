@@ -29,7 +29,7 @@ class Net(nn.Module):
 def train_worker(rank, world_size, epochs=5):
     # init process group
     os.environ["MASTER_ADDR"] = "127.0.0.1"
-    os.environ["MASTER_PORT"] = "29500"
+    os.environ["MASTER_PORT"] = "29501"
     dist.init_process_group("nccl", rank=rank, world_size=world_size)
 
     # Device
@@ -47,6 +47,7 @@ def train_worker(rank, world_size, epochs=5):
 
     # Model / optimizer
     model = Net().to(device)
+    # PyTorch wrapper for DDP ** no need to manually sync gradients
     model = DDP(model, device_ids=[rank])  # wrap in DDP
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
@@ -79,6 +80,7 @@ def train_worker(rank, world_size, epochs=5):
 
 if __name__ == "__main__":
     # n_gpus = torch.cuda.device_count()
+    print('Start MNIST training on multiple GPUs (DDP with PyTorch)...')
     world_size = 4
     start_time = time.time()
     mp.spawn(train_worker, args=(world_size, 5), nprocs=world_size, join=True)

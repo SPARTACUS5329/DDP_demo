@@ -28,7 +28,7 @@ class Net(nn.Module):
 def train_worker(rank, world_size, epochs=5):
     # init process group
     os.environ["MASTER_ADDR"] = "127.0.0.1"
-    os.environ["MASTER_PORT"] = "29500"
+    os.environ["MASTER_PORT"] = "29501"
     dist.init_process_group("nccl", rank=rank, world_size=world_size)
 
     # Device
@@ -48,6 +48,7 @@ def train_worker(rank, world_size, epochs=5):
     model = Net().to(device)
     model = DDP(model, device_ids=[rank])  # wrap in DDP
     criterion = nn.CrossEntropyLoss()
+    # Adjust learning rate based on number of GPUs or world size
     optimizer = optim.Adam(model.parameters(), lr=0.001 * 4)
 
     losses = []

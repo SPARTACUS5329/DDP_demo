@@ -27,7 +27,7 @@ class Net(nn.Module):
 def train_worker(rank, world_size, epochs=5):
     # init process group
     os.environ["MASTER_ADDR"] = "127.0.0.1"
-    os.environ["MASTER_PORT"] = "29500"
+    os.environ["MASTER_PORT"] = "29502"
     dist.init_process_group("nccl", rank=rank, world_size=world_size)
 
     # Device
@@ -39,9 +39,10 @@ def train_worker(rank, world_size, epochs=5):
         transforms.ToTensor(),
         transforms.Lambda(lambda x: x.view(-1))  # flatten
     ])
+
     dataset = datasets.MNIST(root="./data", train=True, download=True, transform=transform)
-    sampler = DistributedSampler(dataset, num_replicas=world_size, rank=rank, shuffle=True)
-    train_loader = DataLoader(dataset, batch_size=6400, sampler=sampler)
+    sampler = DistributedSampler(dataset, num_replicas=world_size, rank=rank, shuffle=True) # important
+    train_loader = DataLoader(dataset, batch_size=6400, sampler=sampler) # notice sampler as arg
 
     # Model / optimizer
     model = Net().to(device)
@@ -52,17 +53,17 @@ def train_worker(rank, world_size, epochs=5):
     for epoch in range(epochs):
         sampler.set_epoch(epoch)  # important for shuffle
         for data, target in train_loader:
-            data, target = data.to(device), target.to(device)
+            data, target = data.to(device), target.to(device) # move to device
             optimizer.zero_grad()
             output = model(data)
             loss = criterion(output, target)
             loss.backward()
 
-            # manual gradient averaging
+            # ***manual gradient averaging = DDP***
             for param in model.parameters():
                 if param.grad is not None:
-                    dist.all_reduce(param.grad.data, op=dist.ReduceOp.SUM)
-                    param.grad.data /= world_size
+                    dist.all_reduce(param.grad.data, op=dist.ReduceOp.SUM) # sum gradients
+                    param.grad.data /= world_size # average gradients
 
             optimizer.step()
             losses.append(loss.item())

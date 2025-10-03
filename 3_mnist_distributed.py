@@ -6,6 +6,10 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 
+torch.manual_seed(0)
+torch.cuda.manual_seed(0)
+
+# Simple Feedforward Neural Network for MNIST
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
@@ -17,20 +21,25 @@ class Net(nn.Module):
     def forward(self, x):
         return self.fc(x)
 
-
+# Training function for each worker
 def train_worker(rank, epochs=5):
+    # Data loading
     transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Lambda(lambda x: x.view(-1))  # flatten 28x28 -> 784
     ])
     train_dataset = datasets.MNIST(root="./data", train=True, download=True, transform=transform)
     train_loader = DataLoader(train_dataset, batch_size=6400, shuffle=True)
-
+    
+    # Assign device based on rank
     device = torch.device(f"cuda:{rank}" if torch.cuda.is_available() else "cpu")
+
+    # Model, Loss, Optimizer
     model = Net().to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
+    # Training loop
     losses = []
     for epoch in range(epochs):
         for data, target in train_loader:
