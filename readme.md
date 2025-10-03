@@ -8,6 +8,7 @@ Slide: https://docs.google.com/presentation/d/1y15fzHoBhjBFpmy44Q3VrW0gJMS7ePhCV
     Check for slow import: python -X importtime file.py
     Deep profiling: 
     - pip install -U tensorboard torch-tb-profiler
+    - **Add profile context in the code**
     - tensorboard --logdir=./log
 
 ## Files
@@ -15,10 +16,10 @@ Slide: https://docs.google.com/presentation/d/1y15fzHoBhjBFpmy44Q3VrW0gJMS7ePhCV
 - `1_torch_dist_gpu.py` Launch 4 processes and performs all_reduce in GPU
 - `2_mnist_training.py` A simple MNIST classification pipeline using a single GPU
 - `3_mnist_distributed.py` 4 identical processes performing exactly same task - a simple MNIST classification pipeline GPU
-- `4_mnist_manual_ddp.py` A manual implementation of DDP on previous pipeline with distributed sampler. Output saved as `./log_ddp`. Inspect using `tensorboard --logdir=./log_ddp`.
-- `5_mnist_manual_ddp_profile.py` Tensorboard profiler on previous code, reduced epoch for smaller profile data
+- `4_mnist_manual_ddp.py` A manual implementation of DDP on previous pipeline with distributed sampler
+- `5_mnist_manual_ddp_profile.py` Tensorboard profiler on previous code, reduced epoch for smaller profile data. Output saved as `./log_ddp`. Inspect using `tensorboard --logdir=./log_ddp`.
 - `6_mnist_ddp_pt.py` PyTorch wrapper for DDP. No manual all_reduce needed
 - `7_mnist_ddp_pt_timing.py` PyTorch DDP code with arg = GPU number. Prints out the time taken for model training. arg = 4 should give lower runtime.
 - `8_mnist_ddp_pt_lr.py` Adjustment of learning rate so that the loss curve matches single GPU.
-- `test-profile.py` A smaller DDP ML pipeline with dummy data and Tensorboard profiling for easier profiling viewing. Output saved as `./log`. Inspect using `tensorboard --logdir=./log`.
+- `test-profile.py` A smaller DDP ML pipeline with dummy data and Tensorboard profiling for easier inspection. Output saved as `./log`. Inspect using `tensorboard --logdir=./log`.
 
