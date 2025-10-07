@@ -34,7 +34,7 @@ Slide: https://docs.google.com/presentation/d/1y15fzHoBhjBFpmy44Q3VrW0gJMS7ePhCV
 Useful Commands:
 - Multinode allocation: salloc --nodes 2 --qos interactive --time 00:30:00 __--ntasks-per-node=4__ --cpus-per-task=32 --constraint gpu --gpus-per-node 4 --account=<acc_name>_g
 - module load pytorch/2.6.0
-- Run: ./multinode_setup_and_run.sh <filename>.py
+- Run: ./multinode_setup_and_run.sh `<filename>`.py
 
 #### Files
 
