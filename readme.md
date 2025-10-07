@@ -13,6 +13,7 @@ Slide: https://docs.google.com/presentation/d/1y15fzHoBhjBFpmy44Q3VrW0gJMS7ePhCV
     - pip install -U tensorboard torch-tb-profiler
     - **Add profile context in the code**
     - tensorboard --logdir=./log
+    Debug using print: print('test', flush=True)
 
 ## Files
 
@@ -39,4 +40,5 @@ Useful Commands:
 
 - `9_torch_dist_multi_node.py` all_reduce example for multinode.
 - `10_mnist_ddp_pt_multinode.py` MNIST training pipeline for MultiNode DDP.
-- `11_mnist_ddp_pt_multinode_streaming.py`MNIST training pipeline for MultiNode DDP with streaming dataloader from disk.
+- `11_mnist_ddp_pt_multinode_streaming.py` MNIST training pipeline for MultiNode DDP with streaming dataloader from disk.
+- `create_mnist_h5.py` Create chunked MNIST dataset for streaming.
