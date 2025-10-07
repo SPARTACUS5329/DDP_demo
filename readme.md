@@ -3,7 +3,10 @@ Slide: https://docs.google.com/presentation/d/1y15fzHoBhjBFpmy44Q3VrW0gJMS7ePhCV
 
 ## Useful Commands 
 
-    Allocate node: salloc --nodes 1 --qos interactive --time 01:00:00 --constraint gpu --gpus-per-node 4 --account=<acc_name>_g
+    Allocate node: 
+    - Single Node: salloc --nodes 1 --qos interactive --time 01:00:00 --constraint gpu --gpus-per-node 4 --account=<acc_name>_g
+    - Multinode: salloc --nodes 2 --qos interactive --time 00:30:00 --ntasks-per-node=4 --cpus-per-task=32 --constraint gpu --gpus-per-node 4 --account=<acc_name>_g
+        - Run: ./multinode_setup_and_run.sh [9-11]<filename>.py
     Enable PyTorch: module load pytorch/2.6.0
     Check for slow import: python -X importtime file.py
     Deep profiling: 

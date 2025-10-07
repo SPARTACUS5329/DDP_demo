@@ -3,3 +3,4 @@ data
 log
 log_ddp_manual
 __pycache__
+mnist_data
