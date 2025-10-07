@@ -15,6 +15,8 @@ Slide: https://docs.google.com/presentation/d/1y15fzHoBhjBFpmy44Q3VrW0gJMS7ePhCV
     - tensorboard --logdir=./log
 
 ## Files
+
+### Day 1
 - `0_torch_dist.py` Launch 4 processes and performs all_reduce
 - `1_torch_dist_gpu.py` Launch 4 processes and performs all_reduce in GPU
 - `2_mnist_training.py` A simple MNIST classification pipeline using a single GPU
@@ -26,3 +28,15 @@ Slide: https://docs.google.com/presentation/d/1y15fzHoBhjBFpmy44Q3VrW0gJMS7ePhCV
 - `8_mnist_ddp_pt_lr.py` Adjustment of learning rate so that the loss curve matches single GPU.
 - `test-profile.py` A smaller DDP ML pipeline with dummy data and Tensorboard profiling for easier inspection. Output saved as `./log`. Inspect using `tensorboard --logdir=./log`.
 
+### Day 2
+
+Useful Commands:
+- Multinode allocation: salloc --nodes 2 --qos interactive --time 00:30:00 __--ntasks-per-node=4__ --cpus-per-task=32 --constraint gpu --gpus-per-node 4 --account=<acc_name>_g
+- module load pytorch/2.6.0
+- Run: ./multinode_setup_and_run.sh <filename>.py
+
+#### Files
+
+- `9_torch_dist_multi_node.py` all_reduce example for multinode.
+- `10_mnist_ddp_pt_multinode.py` MNIST training pipeline for MultiNode DDP.
+- `11_mnist_ddp_pt_multinode_streaming.py`MNIST training pipeline for MultiNode DDP with streaming dataloader from disk.
